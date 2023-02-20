@@ -1,0 +1,80 @@
+import { parse, isThisWeek, isThisMonth, format } from "date-fns";
+
+let TodayArray = [];
+let ThisWeekArray = [];
+let ThisMonthArray = [];
+let AllArray = [
+  { name: "Reminder 1", date: "2022-01-01", priority: "High" },
+  { name: "Reminder 2", date: "2022-02-01", priority: "Low" },
+  { name: "Reminder 3", date: "2022-03-01", priority: "Medium" },
+];
+let ProjectArray = [
+  {
+    name: "Cool Project",
+    date: "2022-01-01",
+    reminders: [
+      { name: "Code Everyday", date: "2022-01-01", priority: "High" },
+    ],
+  },
+];
+let updatedProjectArray = [];
+let storedProjectArray = [];
+
+storedProjectArray = localStorage.getItem("ProjectArray");
+if (storedProjectArray) {
+  ProjectArray = JSON.parse(storedProjectArray);
+}
+
+let orderdates = (object) => {
+  const dateObject = parse(object.date, "dd.MM.yyyy", new Date());
+  const week = isThisWeek(dateObject);
+  const month = isThisMonth(dateObject);
+  const today = format(new Date(), "dd.MM.yyyy");
+
+  if (object.date === today) {
+    TodayArray.push(object);
+    AllArray.push(object);
+  } else if (week) {
+    ThisWeekArray.push(object);
+    AllArray.push(object);
+  } else if (month) {
+    ThisMonthArray.push(object);
+    AllArray.push(object);
+  } else if (object.date !== today && !week && !month) {
+    AllArray.push(object);
+  }
+};
+
+let orderdatesproject = (object) => {
+  ProjectArray.push(object);
+  addNewProject(ProjectArray);
+  localStorage.setItem("ProjectArray", JSON.stringify(ProjectArray));
+};
+
+function addNewProject(array) {
+  // Retrieve the current ProjectArray from localStorage
+  const storedProjectArray = localStorage.getItem("ProjectArray");
+
+  if (storedProjectArray) {
+    // Parse the stored array if it exists
+    updatedProjectArray = JSON.parse(storedProjectArray);
+  }
+
+  // Update the stored array with the new array
+  updatedProjectArray = array;
+
+  // Save the updated array to localStorage
+  localStorage.setItem("ProjectArray", JSON.stringify(updatedProjectArray));
+}
+
+export {
+  orderdates,
+  TodayArray,
+  ThisMonthArray,
+  ThisWeekArray,
+  AllArray,
+  ProjectArray,
+  orderdatesproject,
+  updatedProjectArray,
+  storedProjectArray,
+};
